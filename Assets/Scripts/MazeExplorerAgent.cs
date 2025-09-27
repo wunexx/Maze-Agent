@@ -2,12 +2,14 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Policies;
 
 public class MazeExplorerAgent : Agent
 {
     [SerializeField] float _moveSpeed;
     [SerializeField] float _rotationSpeed;
 
+    [SerializeField] BehaviorParameters _behaviorParameters;
     bool _hasKey;
 
     float _cumulativeReward;
@@ -135,5 +137,26 @@ public class MazeExplorerAgent : Agent
 
             EndEpisode();
         }
+    }
+
+    public void ChangeBehaviourType(bool state)
+    {
+        if(state == true)
+        {
+            _behaviorParameters.BehaviorType = BehaviorType.HeuristicOnly;
+        }
+        else
+        {
+            _behaviorParameters.BehaviorType = BehaviorType.Default;
+        }
+    }
+
+    public void ApplyMoveSpeed(int speed)
+    {
+        _moveSpeed = speed;
+    }
+    public void ApplyRotationSpeed(int speed)
+    {
+        _rotationSpeed = speed;
     }
 }

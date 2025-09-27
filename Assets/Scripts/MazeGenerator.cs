@@ -5,65 +5,76 @@ using UnityEngine;
 public class MazeGenerator : MonoBehaviour
 {
     [Header("Maze Settings")]
-    [SerializeField] int _width = 10;
-    [SerializeField] int _height = 10;
+    [SerializeField] int _mazeGridSize = 10;
     [SerializeField] float _cellSize = 2f;
+
     [Header("Maze Parts")]
     [SerializeField] GameObject _wallPrefab;
     [SerializeField] GameObject _groundPrefab;
     [SerializeField] Transform _wallParent;
+
+    [Header("Wall Settings")]
+    [SerializeField] Vector3 _wallScale = new Vector3(2f, 3f, 2f);
+
     [Header("Props")]
     [SerializeField] GameObject _spawnPointPrefab;
     [SerializeField] GameObject _keyPrefab;
     [SerializeField] GameObject _doorPrefab;
-    [Header("Stats Props")]
-    [SerializeField] GameObject _statTextPrefab;
-    [SerializeField] Transform _statTextParent;
+
+    [Header("Other")]
+    [SerializeField] Transform _cameraTransform;
 
     List<GameObject> _mazeObjects = new List<GameObject>();
 
     Transform _key;
     Transform _door;
 
-    TextMeshPro _rewardText;
-    TextMeshPro _episodeText;
+    [SerializeField] TextMeshProUGUI _rewardText;
+    [SerializeField] TextMeshProUGUI _episodeText;
 
     float maxReward = 0;
 
     private int[,] _maze;
+
     private void Start()
     {
         maxReward = 0;
     }
+
     public void Generate()
     {
         DeleteMaze();
-        _maze = new int[_width, _height];
+        _maze = new int[_mazeGridSize, _mazeGridSize];
         GenerateMaze(0, 0);
         BuildMaze();
         PlaceGround();
         SpawnProps();
-        PlaceStatTexts();
+        AdjustCamera();
     }
+
     public Vector3 GetKeyPos()
     {
         return _key.localPosition;
     }
+
     public void DestroyKey()
     {
         if (_mazeObjects.Contains(_key.gameObject))
         {
             _mazeObjects.Remove(_key.gameObject);
-        }else
+        }
+        else
         {
             Debug.Log("Oops!");
         }
         Destroy(_key.gameObject);
     }
+
     public Vector3 GetDoorPos()
     {
         return _door.localPosition;
     }
+
     public void UpdateStatText(int episode, float reward, int step)
     {
         if (reward > maxReward)
@@ -74,34 +85,22 @@ public class MazeGenerator : MonoBehaviour
         _rewardText.text = $"Reward: {reward} | Max Reward: {maxReward}";
         _episodeText.text = $"Episode: {episode} | Step: {step}";
     }
-    void PlaceStatTexts()
-    {
-        GameObject statText1 = Instantiate(_statTextPrefab, _statTextParent);
-        statText1.transform.localPosition = new Vector3((float)(_width - 2) / 2 * _cellSize, 6, ((float)(_height - 2) / 2 * _cellSize) + 5);
-        _mazeObjects.Add(statText1);
-        _episodeText = statText1.GetComponent<TextMeshPro>();
 
-        GameObject statText2 = Instantiate(_statTextPrefab, _statTextParent);
-        statText2.transform.localPosition = new Vector3((float)(_width - 2) / 2 * _cellSize, 6, ((float)(_height - 2) / 2 * _cellSize) - 5);
-        _mazeObjects.Add(statText2);
-        _rewardText = statText2.GetComponent<TextMeshPro>();
-    }
     void PlaceGround()
     {
-        float groundPosX = (float)(_width - 2) / 2 * _cellSize;
-        float groundPosZ = (float)(_height - 2) / 2 * _cellSize;
+        float groundPosX = (float)(_mazeGridSize - 2) / 2 * _cellSize;
+        float groundPosZ = (float)(_mazeGridSize - 2) / 2 * _cellSize;
         Vector3 groundPos = new Vector3(groundPosX, 0, groundPosZ);
 
         GameObject ground = Instantiate(_groundPrefab, transform);
         ground.transform.localPosition = groundPos;
         _mazeObjects.Add(ground);
 
-        float groundXScale = (float)(_width + 2) / 10 * _cellSize;
-        float groundZScale = (float)(_height + 2) / 10 * _cellSize;
+        float groundXScale = (float)(_mazeGridSize + 2) / 10 * _cellSize;
+        float groundZScale = (float)(_mazeGridSize + 2) / 10 * _cellSize;
         Vector3 groundScale = new Vector3(groundXScale, 1, groundZScale);
 
         ground.transform.localScale = groundScale;
-
     }
 
     void GenerateMaze(int x, int y)
@@ -125,54 +124,64 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
+
     void BuildMaze()
     {
-        for (int x = 0; x < _width; x++)
+        // Internal walls
+        for (int x = 0; x < _mazeGridSize; x++)
         {
-            for (int y = 0; y < _height; y++)
+            for (int y = 0; y < _mazeGridSize; y++)
             {
                 if (_maze[x, y] == 0)
                 {
                     GameObject wall = Instantiate(_wallPrefab, _wallParent);
-                    wall.transform.localPosition = new Vector3(x * _cellSize, 1.5f, y * _cellSize);
+                    wall.transform.localPosition = new Vector3(x * _cellSize, 0, y * _cellSize);
+                    wall.transform.localScale = _wallScale;
                     _mazeObjects.Add(wall);
                 }
             }
         }
-        for (int x = -1; x <= _width - 1; x++)
+
+        // Border walls (top/bottom)
+        for (int x = -1; x <= _mazeGridSize - 1; x++)
         {
             GameObject wall1 = Instantiate(_wallPrefab, _wallParent);
-            wall1.transform.localPosition = new Vector3(x * _cellSize, 1.5f, -1 * _cellSize);
+            wall1.transform.localPosition = new Vector3(x * _cellSize, 0, -1 * _cellSize);
+            wall1.transform.localScale = _wallScale;
             _mazeObjects.Add(wall1);
 
             GameObject wall2 = Instantiate(_wallPrefab, _wallParent);
-            wall2.transform.localPosition = new Vector3(x * _cellSize, 1.5f, _height * _cellSize - _cellSize);
+            wall2.transform.localPosition = new Vector3(x * _cellSize, 0, _mazeGridSize * _cellSize - _cellSize);
+            wall2.transform.localScale = _wallScale;
             _mazeObjects.Add(wall2);
         }
 
-        for (int y = 0; y < _height; y++)
+        // Border walls (left/right)
+        for (int y = 0; y < _mazeGridSize; y++)
         {
             GameObject wall1 = Instantiate(_wallPrefab, _wallParent);
-            wall1.transform.localPosition = new Vector3(-1 * _cellSize, 1.5f, y * _cellSize);
+            wall1.transform.localPosition = new Vector3(-1 * _cellSize, 0, y * _cellSize);
+            wall1.transform.localScale = _wallScale;
             _mazeObjects.Add(wall1);
 
             GameObject wall2 = Instantiate(_wallPrefab, _wallParent);
-            wall2.transform.localPosition = new Vector3(_width * _cellSize - _cellSize, 1.5f, y * _cellSize);
+            wall2.transform.localPosition = new Vector3(_mazeGridSize * _cellSize - _cellSize, 0, y * _cellSize);
+            wall2.transform.localScale = _wallScale;
             _mazeObjects.Add(wall2);
         }
-
     }
+
     void SpawnProps()
     {
-        GameObject spawnPoint = Instantiate(_spawnPointPrefab,  transform);
+        GameObject spawnPoint = Instantiate(_spawnPointPrefab, transform);
         spawnPoint.transform.localPosition = new Vector3(0, 1, 0);
         _mazeObjects.Add(spawnPoint);
 
         List<Vector2Int> pathTiles = new List<Vector2Int>();
 
-        for (int x = 0; x < _width; x++)
+        for (int x = 0; x < _mazeGridSize; x++)
         {
-            for (int y = 0; y < _height; y++)
+            for (int y = 0; y < _mazeGridSize; y++)
             {
                 if (_maze[x, y] == 1)
                 {
@@ -188,7 +197,6 @@ public class MazeGenerator : MonoBehaviour
         } while (keyPos == Vector2Int.zero);
 
         Vector2Int doorPos;
-
         do
         {
             doorPos = pathTiles[Random.Range(0, pathTiles.Count)];
@@ -206,11 +214,11 @@ public class MazeGenerator : MonoBehaviour
         door.transform.localPosition = doorWorldPos;
         _door = door.transform;
         _mazeObjects.Add(door);
-
     }
+
     bool InBounds(int x, int y)
     {
-        return x >= 0 && y >= 0 && x < _width && y < _height;
+        return x >= 0 && y >= 0 && x < _mazeGridSize && y < _mazeGridSize;
     }
 
     void Shuffle(List<Vector2Int> list)
@@ -223,6 +231,7 @@ public class MazeGenerator : MonoBehaviour
             list[randomIndex] = temp;
         }
     }
+
     void DeleteMaze()
     {
         foreach (var obj in _mazeObjects)
@@ -230,5 +239,30 @@ public class MazeGenerator : MonoBehaviour
             Destroy(obj);
         }
         _mazeObjects.Clear();
+    }
+
+    public void ApplyMapSize(int size)
+    {
+        _mazeGridSize = size;
+    }
+    public void ApplyCellSize(int size)
+    {
+        _cellSize = size;
+        _wallScale = new Vector3(size, 3f, size);
+    }
+
+    void AdjustCamera()
+    {
+        float centerX = (float)(_mazeGridSize - 1) / 2 * _cellSize;
+        float centerZ = (float)(_mazeGridSize - 1) / 2 * _cellSize;
+
+        float finalXPos = centerX * 2;
+
+        float mazeSize = _mazeGridSize * _cellSize;
+
+        float camHeight = mazeSize * 1.4f;
+
+        _cameraTransform.position = new Vector3(finalXPos, camHeight, centerZ);
+        _cameraTransform.LookAt(new Vector3(finalXPos, 0, centerZ));
     }
 }
