@@ -262,7 +262,7 @@ public class MazeGenerator : MonoBehaviour
 
         float camHeight = mazeSize * 1.4f;
 
-        _cameraTransform.position = new Vector3(finalXPos, camHeight, centerZ);
-        _cameraTransform.LookAt(new Vector3(finalXPos, 0, centerZ));
+        _cameraTransform.position = new Vector3(centerX, camHeight, centerZ);
+        _cameraTransform.LookAt(new Vector3(centerX, 0, centerZ));
     }
 }
