@@ -1,0 +1,4 @@
+behaviors:
+  MazeExplorer:
+    trainer_type: ppo
+    max_steps: 2000000

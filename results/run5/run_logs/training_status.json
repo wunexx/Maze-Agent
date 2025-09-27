@@ -1,0 +1,65 @@
+{
+    "MazeExplorer": {
+        "checkpoints": [
+            {
+                "steps": 1000010,
+                "file_path": "results\\run5\\MazeExplorer\\MazeExplorer-1000010.onnx",
+                "reward": 2.879977714419365,
+                "creation_time": 1750335812.0826328,
+                "auxillary_file_paths": [
+                    "results\\run5\\MazeExplorer\\MazeExplorer-1000010.pt"
+                ]
+            },
+            {
+                "steps": 1000010,
+                "file_path": "results\\run5\\MazeExplorer\\MazeExplorer-1000010.onnx",
+                "reward": null,
+                "creation_time": 1750338310.567609,
+                "auxillary_file_paths": [
+                    "results\\run5\\MazeExplorer\\MazeExplorer-1000010.pt"
+                ]
+            },
+            {
+                "steps": 1499973,
+                "file_path": "results\\run5\\MazeExplorer\\MazeExplorer-1499973.onnx",
+                "reward": 0.9005321632139385,
+                "creation_time": 1750339624.1204667,
+                "auxillary_file_paths": [
+                    "results\\run5\\MazeExplorer\\MazeExplorer-1499973.pt"
+                ]
+            },
+            {
+                "steps": 1999949,
+                "file_path": "results\\run5\\MazeExplorer\\MazeExplorer-1999949.onnx",
+                "reward": 0.49415015103295445,
+                "creation_time": 1750340857.496727,
+                "auxillary_file_paths": [
+                    "results\\run5\\MazeExplorer\\MazeExplorer-1999949.pt"
+                ]
+            },
+            {
+                "steps": 2000013,
+                "file_path": "results\\run5\\MazeExplorer\\MazeExplorer-2000013.onnx",
+                "reward": 0.49415015103295445,
+                "creation_time": 1750340857.5606863,
+                "auxillary_file_paths": [
+                    "results\\run5\\MazeExplorer\\MazeExplorer-2000013.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 2000013,
+            "file_path": "results\\run5\\MazeExplorer.onnx",
+            "reward": 0.49415015103295445,
+            "creation_time": 1750340857.5606863,
+            "auxillary_file_paths": [
+                "results\\run5\\MazeExplorer\\MazeExplorer-2000013.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cpu"
+    }
+}
