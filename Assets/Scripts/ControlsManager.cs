@@ -54,7 +54,6 @@ public class ControlsManager : MonoBehaviour
 
                 if (s.settingType == SettingType.MapSize)
                 {
-                    // Ensure value is even and >= minValue
                     finalValue = Mathf.Max(s.minValue, ((int)value / 2) * 2);
                 }
 
