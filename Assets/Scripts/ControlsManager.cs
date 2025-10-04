@@ -47,7 +47,7 @@ public class ControlsManager : MonoBehaviour
 
             ApplySetting(s.settingType, (int)s.valueSlider.value);
 
-            int index = i;
+            //int index = i;
             s.valueSlider.onValueChanged.AddListener((value) =>
             {
                 int finalValue = (int)value;
